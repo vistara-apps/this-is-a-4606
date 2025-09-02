@@ -11,6 +11,7 @@ function App() {
   const [activeView, setActiveView] = useState('dashboard')
   const [orders, setOrders] = useState(mockOrders)
   const [products, setProducts] = useState(mockProducts)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleGenerateLabel = (orderId) => {
     setOrders(orders.map(order => 
@@ -18,6 +19,11 @@ function App() {
         ? { ...order, status: 'Shipped', trackingNumber: `TK${Date.now()}` }
         : order
     ))
+  }
+
+  const handleViewChange = (view) => {
+    setActiveView(view)
+    setIsMobileMenuOpen(false) // Close mobile menu when view changes
   }
 
   const renderView = () => {
@@ -35,15 +41,32 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <Header />
+      <Header 
+        isMobileMenuOpen={isMobileMenuOpen} 
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        activeView={activeView}
+        onViewChange={handleViewChange}
+      />
       <div className="flex">
-        <Sidebar activeView={activeView} setActiveView={setActiveView} />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-0 sm:ml-64">
+        <Sidebar 
+          activeView={activeView} 
+          setActiveView={handleViewChange}
+          isMobileMenuOpen={isMobileMenuOpen}
+        />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-0 sm:ml-64 transition-all duration-300">
           <div className="max-w-6xl mx-auto">
             {renderView()}
           </div>
         </main>
       </div>
+      
+      {/* Mobile menu overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 sm:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </div>
   )
 }
